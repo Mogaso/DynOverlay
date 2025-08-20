@@ -38,6 +38,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
 .divider{margin:.8rem 0;color:var(--muted);text-align:center}
 .user-list{display:flex;gap:.5rem;flex-wrap:wrap}
 .user-pill button{background:#142033;border:1px solid #2b3c58;border-radius:999px;color:#cfe1ff;padding:.45rem .75rem;cursor:pointer}
+.auth-foot{margin-top:1rem;color:var(--muted);font-size:.9rem;text-align:center;width:100%;}
 
 /* App */
 .topbar{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:linear-gradient(to bottom,#000a,transparent);padding:.4rem var(--pad);z-index:20}
