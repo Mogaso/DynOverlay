@@ -5,7 +5,8 @@ Zusätzlich ist die App **PWA-ready** für Android und iOS und kann wie eine nat
 
 
 
-<img width="1206" height="2622" alt="image" src="https://github.com/user-attachments/assets/fe3ee1c9-6e2d-4a4d-9049-b9301831e7eb" />
+![image](https://github.com/user-attachments/assets/3d7bfe96-b91b-46b2-874e-3ba633b3b302)
+
 
 ![image](https://github.com/user-attachments/assets/0a165e40-d985-4a73-adf8-7dbfbca55b25)
 
