@@ -3,12 +3,7 @@
 Plane und markiere Bauprojekte direkt auf der **Dynmap** – mit Formen, Text, Messen, Raster/Chunks, PNG-Export, Undo/Redo und nutzerbezogenem Autosave.  
 Zusätzlich ist die App **PWA-ready** für Android und iOS und kann wie eine native App installiert werden.
 
-
-
 ![image](https://github.com/user-attachments/assets/3d7bfe96-b91b-46b2-874e-3ba633b3b302)
-
-
-![image](https://github.com/user-attachments/assets/0a165e40-d985-4a73-adf8-7dbfbca55b25)
 
 ---
 
