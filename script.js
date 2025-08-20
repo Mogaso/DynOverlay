@@ -1,4 +1,4 @@
-// script.js
+/* /custom-map/script.js */
 const els = {
   viewport: document.getElementById('viewport'),
   dynmap: document.getElementById('dynmap'),

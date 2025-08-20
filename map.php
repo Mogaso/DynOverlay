@@ -1,5 +1,5 @@
 <?php
-// map.php
+/* /custom-map/map.php */
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: index.php'); exit; }
 $user = $_SESSION['user'];
@@ -8,6 +8,7 @@ $DATA_FILE = __DIR__ . '/data/user.json';
 if (!is_dir(__DIR__ . '/data')) mkdir(__DIR__ . '/data', 0775, true);
 if (!file_exists($DATA_FILE)) file_put_contents($DATA_FILE, json_encode(new stdClass(), JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 
+/* Simple JSON API for autosave/load */
 if (isset($_GET['api'])) {
   header('Content-Type: application/json; charset=utf-8');
   $db = json_decode(file_get_contents($DATA_FILE), true) ?? [];
@@ -34,20 +35,7 @@ if (isset($_GET['api'])) {
   http_response_code(400); echo '{"ok":false}'; exit;
 }
 
-if (isset($_GET['manifest'])) {
-  header('Content-Type: application/manifest+json; charset=utf-8');
-  echo json_encode([
-    "name"=>"DynOverlay","short_name"=>"DynOverlay","id"=>"./","start_url"=>"./index.php",
-    "display"=>"standalone","background_color"=>"#0b0f14","theme_color"=>"#0b0f14",
-    "icons"=>[["src"=>"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='64' fill='%230b0f14'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-size='240' fill='%23ffffff' font-family='Arial,Helvetica,sans-serif'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E","sizes"=>"512x512","type"=>"image/svg+xml","purpose"=>"any maskable"]]
-  ], JSON_UNESCAPED_SLASHES); exit;
-}
-if (isset($_GET['sw'])) { header('Content-Type: application/javascript; charset=utf-8'); ?>
-self.addEventListener('install',()=>self.skipWaiting());
-self.addEventListener('activate',e=>self.clients.claim());
-self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>new Response('',{status:504}))));
-<?php exit; }
-
+/* Set your Dynmap URL here */
 $dynmap = 'https://...;surface;-1,64,-1;2';
 ?>
 <!DOCTYPE html>
@@ -56,15 +44,31 @@ $dynmap = 'https://...;surface;-1,64,-1;2';
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DynOverlay • Karte</title>
-<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="/custom-map/style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="/custom-map/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DynOverlay">
+<link rel="apple-touch-icon" sizes="180x180" href="/custom-map/img/ios/180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/custom-map/img/ios/152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/custom-map/img/ios/120.png">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/custom-map/img/ios/32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/custom-map/img/ios/16.png">
+
 <style>
 iframe.map { pointer-events:auto !important; }
 #overlay   { pointer-events:none !important; }
 #shield    { pointer-events:none !important; }
-
 body.editing iframe.map { pointer-events:none !important; }
 body.editing #overlay   { pointer-events:auto !important; }
-/* shield bleibt auch im Edit-Modus auf none */
 </style>
 </head>
 <body>
@@ -84,7 +88,7 @@ body.editing #overlay   { pointer-events:auto !important; }
     <div class="right">
       <button class="btn ghost cal" id="calibrate">🎯 Kalibrieren</button>
       <button class="btn ghost" id="btnSave">💾 Speichern</button>
-      <a class="btn ghost" href="index.php">← Nutzer wechseln</a>
+      <a class="btn ghost" href="/custom-map/index.php">← Nutzer wechseln</a>
     </div>
   </div>
 
@@ -182,13 +186,20 @@ body.editing #overlay   { pointer-events:auto !important; }
 </div>
 
 <script>
-  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('map.php?sw=1').catch(()=>{}); }
   window.APP_USER = <?=json_encode($user)?>;
-  window.API = { load: 'map.php?api=load', save: 'map.php?api=save' };
+  window.API = { load: '/custom-map/map.php?api=load', save: '/custom-map/map.php?api=save' };
   window.DYNMAP_URL = <?=json_encode($dynmap)?>;
 </script>
-<script src="script.js"></script>
+<script src="/custom-map/script.js"></script>
 <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/custom-map/sw.js', { scope: '/custom-map/' }).catch(()=>{});
+}
+(function(){
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) document.documentElement.classList.add('standalone');
+})();
+/* Ensure pointer-events toggle matches mode */
 (function(){
   function applyMode(edit){
     document.body.classList.toggle('editing', !!edit);
@@ -215,18 +226,6 @@ body.editing #overlay   { pointer-events:auto !important; }
     window.setMode(false);
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
-
-  function initCal(){
-    const btnCal = document.getElementById('calibrate');
-    if (!btnCal) return;
-    btnCal.addEventListener('click', ()=>{
-      document.getElementById('side')?.classList.add('open');
-      document.querySelectorAll('.tabs > button').forEach(b=>b.classList.toggle('active', b.dataset.tab==='cal'));
-      document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('hide', t.id!=='tab-cal'));
-      setTimeout(()=>document.getElementById('calBlocks')?.focus(), 50);
-    });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCal); else initCal();
 })();
 </script>
 </body>

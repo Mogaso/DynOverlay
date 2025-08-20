@@ -1,5 +1,5 @@
 <?php
-// index.php
+/* /custom-map/index.php */
 session_start();
 $DATA_FILE = __DIR__ . '/data/user.json';
 if (!is_dir(__DIR__ . '/data')) { mkdir(__DIR__ . '/data', 0775, true); }
@@ -36,8 +36,24 @@ $users = array_keys($db);
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DynOverlay • Login</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="map.php?manifest=1">
+
+<link rel="stylesheet" href="/custom-map/style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="/custom-map/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DynOverlay">
+<link rel="apple-touch-icon" sizes="180x180" href="/custom-map/img/ios/180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/custom-map/img/ios/152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/custom-map/img/ios/120.png">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/custom-map/img/ios/32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/custom-map/img/ios/16.png">
 </head>
 <body class="auth-body">
   <div class="auth-card">
@@ -55,7 +71,18 @@ $users = array_keys($db);
 
     <form method="post" class="auth-form">
       <label for="username">Benutzername</label>
-      <input id="username" name="username" placeholder="z. B. Mogaso" autocomplete="username" required>
+      <input
+        id="username"
+        name="username"
+        placeholder="z. B. Mogaso"
+        autocomplete="username"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+        inputmode="text"
+        enterkeyhint="go"
+        required
+      >
       <button class="btn primary" type="submit">Weiter zur Karte</button>
     </form>
 
@@ -73,5 +100,33 @@ $users = array_keys($db);
 
     <footer class="auth-foot">Keine Passwörter. Alles lokal in <code>data/user.json</code>.</footer>
   </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/custom-map/sw.js', { scope: '/custom-map/' }).catch(()=>{});
+}
+(function(){
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) document.documentElement.classList.add('standalone');
+})();
+
+// iOS/Android: Kein Autofokus -> Tastatur soll nicht sofort aufgehen
+(function(){
+  function blurIfNeeded(){
+    const a = document.activeElement;
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) {
+      a.blur();
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(blurIfNeeded, 0), { once: true });
+  } else {
+    setTimeout(blurIfNeeded, 0);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') setTimeout(blurIfNeeded, 0);
+  });
+})();
+</script>
 </body>
 </html>
