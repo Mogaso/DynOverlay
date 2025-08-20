@@ -98,7 +98,7 @@ $users = array_keys($db);
       </div>
     <?php endif; ?>
 
-    <footer class="auth-foot">Keine Passwörter. Alles lokal in <code>data/user.json</code>.</footer>
+    <footer class="auth-foot">v1.0</footer>
   </div>
 
 <script>
