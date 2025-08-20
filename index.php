@@ -98,7 +98,10 @@ $users = array_keys($db);
       </div>
     <?php endif; ?>
 
-    <footer class="auth-foot">v1.0</footer>
+<footer class="auth-foot">
+  <a href="https://github.com/Mogaso/DynOverlay" target="_blank" rel="noopener noreferrer">v1.0</a>
+</footer>
+
   </div>
 
 <script>
